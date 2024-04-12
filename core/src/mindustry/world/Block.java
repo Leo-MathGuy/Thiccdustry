@@ -1368,7 +1368,7 @@ public class Block extends UnlockableContent implements Senseable {
             }
         }
 
-        buildCost *= buildCostMultiplier * 10f;
+        buildCost *= buildCostMultiplier * 5f;
 
         consumers = consumeBuilder.toArray(Consume.class);
         optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore())
