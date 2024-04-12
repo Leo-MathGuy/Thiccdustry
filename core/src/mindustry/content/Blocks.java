@@ -3281,13 +3281,16 @@ public class Blocks {
                 tier = 2;
                 drillTime = 500;
                 size = 4;
-                buildCostMultiplier = 2f;
+                buildCostMultiplier = 1f;
 
                 // mechanical drill doesn't work in space
                 envEnabled ^= Env.space;
                 researchCost = with(Items.copper, 70);
 
+                hasPower = true;
+
                 consumeLiquid(Liquids.water, 0.3f).boost();
+                consumePower(0.15f);
             }
         };
 
