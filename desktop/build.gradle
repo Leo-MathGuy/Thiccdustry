@@ -70,7 +70,7 @@ if(!project.ext.hasSprites() && System.getenv("JITPACK") != "true"){
 task steamtest(dependsOn: dist){
     doLast{
         copy{
-            from "build/libs/Mindustry.jar"
+            from "build/libs/Thiccdustry.jar"
             if(project.hasProperty("destination")){
                 into project.property("destination")
             }else if(System.properties["os.name"].contains("Mac")){
