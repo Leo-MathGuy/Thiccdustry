@@ -3718,27 +3718,27 @@ public class Blocks {
             {
                 requirements(Category.turret, with(Items.copper, 35));
                 ammo(
-                        Items.copper, new BasicBulletType(2.5f, 9) {
+                        Items.copper, new BasicBulletType(5f, 50) {
                             {
-                                width = 7f;
-                                height = 9f;
+                                width = 14f;
+                                height = 17f;
                                 lifetime = 60f;
                                 ammoMultiplier = 2;
                             }
                         },
-                        Items.graphite, new BasicBulletType(3.5f, 18) {
+                        Items.graphite, new BasicBulletType(3f, 95) {
                             {
-                                width = 9f;
-                                height = 12f;
+                                width = 14f;
+                                height = 15f;
                                 reloadMultiplier = 0.6f;
                                 ammoMultiplier = 4;
                                 lifetime = 60f;
                             }
                         },
-                        Items.silicon, new BasicBulletType(3f, 12) {
+                        Items.silicon, new BasicBulletType(6f, 65) {
                             {
-                                width = 7f;
-                                height = 9f;
+                                width = 12f;
+                                height = 18f;
                                 homingPower = 0.1f;
                                 reloadMultiplier = 1.5f;
                                 ammoMultiplier = 5;
@@ -3746,36 +3746,22 @@ public class Blocks {
                             }
                         });
 
-                shoot = new ShootAlternate(3.5f);
+                shoot = new ShootSpread(2, 1f);
 
                 recoils = 2;
-                drawer = new DrawTurret() {
-                    {
-                        for (int i = 0; i < 2; i++) {
-                            int f = i;
-                            parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")) {
-                                {
-                                    progress = PartProgress.recoil;
-                                    recoilIndex = f;
-                                    under = true;
-                                    moveY = -1.5f;
-                                }
-                            });
-                        }
-                    }
-                };
-
                 recoil = 0.5f;
-                shootY = 3f;
-                reload = 20f;
-                range = 110;
+                shootY = 5.2f;
+                reload = 80f;
+                range = 180f;
                 shootCone = 15f;
                 ammoUseEffect = Fx.casing1;
-                health = 250;
-                inaccuracy = 2f;
-                rotateSpeed = 10f;
-                coolant = consumeCoolant(0.1f);
-                researchCostMultiplier = 0.05f;
+                health = 800;
+                inaccuracy = 6f;
+                rotateSpeed = 15f;
+                coolant = consumeCoolant(0.15f);
+                researchCostMultiplier = 0.1f;
+
+                size = 3;
 
                 limitRange();
             }
