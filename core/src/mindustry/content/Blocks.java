@@ -2343,12 +2343,15 @@ public class Blocks {
 
         conveyor = new Conveyor("conveyor") {
             {
-                requirements(Category.distribution, with(Items.copper, 1));
-                health = 45;
+                requirements(Category.distribution, with(Items.copper, 8));
+                health = 200;
                 speed = 0.03f;
                 displayedSpeed = 4.2f;
                 buildCostMultiplier = 2f;
-                researchCost = with(Items.copper, 5);
+                researchCost = with(Items.copper, 25);
+
+                size = 2;
+                setCapacity(6);
             }
         };
 
@@ -3718,38 +3721,39 @@ public class Blocks {
             {
                 requirements(Category.turret, with(Items.copper, 35));
                 ammo(
-                        Items.copper, new BasicBulletType(5f, 50) {
+                        Items.copper, new BasicBulletType(5f, 100) {
                             {
                                 width = 14f;
                                 height = 17f;
                                 lifetime = 60f;
-                                ammoMultiplier = 2;
+                                ammoMultiplier = 1;
                             }
                         },
-                        Items.graphite, new BasicBulletType(3f, 95) {
+                        Items.graphite, new BasicBulletType(3f, 150) {
                             {
                                 width = 14f;
                                 height = 15f;
                                 reloadMultiplier = 0.6f;
-                                ammoMultiplier = 4;
+                                ammoMultiplier = 3;
                                 lifetime = 60f;
                             }
                         },
-                        Items.silicon, new BasicBulletType(6f, 65) {
+                        Items.silicon, new BasicBulletType(6f, 125) {
                             {
                                 width = 12f;
                                 height = 18f;
                                 homingPower = 0.1f;
                                 reloadMultiplier = 1.5f;
-                                ammoMultiplier = 5;
+                                ammoMultiplier = 2;
                                 lifetime = 60f;
                             }
                         });
 
                 shoot = new ShootSpread(2, 1f);
 
-                recoils = 2;
-                recoil = 0.5f;
+                recoil = 5f;
+                ammoPerShot = 8;
+
                 shootY = 5.2f;
                 reload = 80f;
                 range = 180f;
