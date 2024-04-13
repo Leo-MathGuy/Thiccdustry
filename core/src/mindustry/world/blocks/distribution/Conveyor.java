@@ -1,5 +1,7 @@
 package mindustry.world.blocks.distribution;
 
+import java.lang.Math;
+
 import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -377,7 +379,18 @@ public class Conveyor extends Block implements Autotiler {
             Tile facing = Edges.getFacingEdge(source.tile, tile);
             if (facing == null)
                 return false;
-            int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
+
+            int direction;
+            if (size == 1) {
+                direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
+            } else {
+                Vec2 relCoords = this.getRelCoords(facing);
+                var angle = Mathf.angle(relCoords.x, relCoords.y) + 45f + 180f; // Math
+
+                direction = Mathf.floor(angle / 90) % 4;
+            }
+
+            Log.info(direction);
 
             var toSide = direction % 2 == 1;
             var facingFront = direction == 0;
@@ -398,6 +411,9 @@ public class Conveyor extends Block implements Autotiler {
 
             int r = rotation;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
+
+            Draw.z(Layer.block + 1);
+
             int ang = ((facing.relativeTo(tile.x, tile.y) - r));
             float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
