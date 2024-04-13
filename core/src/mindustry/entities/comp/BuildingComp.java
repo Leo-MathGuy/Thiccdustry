@@ -1114,7 +1114,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             Building other = proximity.get((i + dump) % proximity.size);
 
             if (todump == null) {
-
                 for (int ii = 0; ii < itemSize; ii++) {
                     if (!items.has(ii))
                         continue;

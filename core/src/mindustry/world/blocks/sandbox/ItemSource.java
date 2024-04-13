@@ -14,10 +14,10 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class ItemSource extends Block{
+public class ItemSource extends Block {
     public int itemsPerSecond = 100;
 
-    public ItemSource(String name){
+    public ItemSource(String name) {
         super(name);
         hasItems = true;
         update = true;
@@ -34,44 +34,44 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void setBars(){
+    public void setBars() {
         super.setBars();
         removeBar("items");
     }
 
     @Override
-    public void setStats(){
+    public void setStats() {
         super.setStats();
 
         stats.add(Stat.output, itemsPerSecond, StatUnit.itemsSecond);
     }
 
     @Override
-    protected TextureRegion[] icons(){
-        return new TextureRegion[]{Core.atlas.find("source-bottom"), region};
+    protected TextureRegion[] icons() {
+        return new TextureRegion[] { Core.atlas.find("source-bottom"), region };
     }
 
     @Override
-    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list) {
         drawPlanConfigCenter(plan, plan.config, "center", true);
     }
 
     @Override
-    public boolean outputsItems(){
+    public boolean outputsItems() {
         return true;
     }
 
-    public class ItemSourceBuild extends Building{
+    public class ItemSourceBuild extends Building {
         public float counter;
         public Item outputItem;
 
         @Override
-        public void draw(){
-            if(outputItem == null){
+        public void draw() {
+            if (outputItem == null) {
                 Draw.rect("cross-full", x, y);
-            }else{
+            } else {
                 Draw.color(outputItem.color);
-                Fill.square(x, y, tilesize/2f - 0.00001f);
+                Fill.square(x, y, tilesize / 2f - 0.00001f);
                 Draw.color();
             }
 
@@ -79,13 +79,14 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void updateTile(){
-            if(outputItem == null) return;
+        public void updateTile() {
+            if (outputItem == null)
+                return;
 
             counter += edelta();
             float limit = 60f / itemsPerSecond;
 
-            while(counter >= limit){
+            while (counter >= limit) {
                 items.set(outputItem, 1);
                 dump(outputItem);
                 items.set(outputItem, 0);
@@ -94,28 +95,29 @@ public class ItemSource extends Block{
         }
 
         @Override
-        public void buildConfiguration(Table table){
-            ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure, selectionRows, selectionColumns);
+        public void buildConfiguration(Table table) {
+            ItemSelection.buildTable(ItemSource.this, table, content.items(), () -> outputItem, this::configure,
+                    selectionRows, selectionColumns);
         }
 
         @Override
-        public boolean acceptItem(Building source, Item item){
+        public boolean acceptItem(Building source, Item item) {
             return false;
         }
 
         @Override
-        public Item config(){
+        public Item config() {
             return outputItem;
         }
 
         @Override
-        public void write(Writes write){
+        public void write(Writes write) {
             super.write(write);
             write.s(outputItem == null ? -1 : outputItem.id);
         }
 
         @Override
-        public void read(Reads read, byte revision){
+        public void read(Reads read, byte revision) {
             super.read(read, revision);
             outputItem = content.item(read.s());
         }
