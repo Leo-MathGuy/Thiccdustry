@@ -399,7 +399,23 @@ public class Conveyor extends Block implements Autotiler {
         public boolean pass(Item item, int side) {
             if (item != null && next != null && next.team == team && next.acceptItem(this, item)) {
                 if (!(nextc == null || side == -1)) {
-                    ((ConveyorBuild) next).handleItem(this, item, side);
+                    var vec = this.getRelCoords(next.tile);
+                    vec.rotate(rotation * -90);
+
+                    vec.y += (side - 0.5) * 2;
+
+                    // up -2.5 - bonk
+                    // down -0.5 - add 1
+
+                    Log.info("@ from @", vec, side);
+
+                    vec.y -= 0.5f;
+
+                    if (vec.y < -1) {
+                        return false;
+                    }
+
+                    ((ConveyorBuild) next).handleItem(this, item, side + Mathf.round(vec.y));
                 } else {
                     next.handleItem(this, item);
                 }
