@@ -2341,7 +2341,7 @@ public class Blocks {
         // endregion
         // region distribution
 
-        conveyor = new Conveyor("conveyor") {
+        conveyor = new ArmoredConveyor("conveyor") {
             {
                 requirements(Category.distribution, with(Items.copper, 8));
                 health = 200;

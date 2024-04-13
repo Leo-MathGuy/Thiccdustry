@@ -2300,5 +2300,21 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return new Vec2(target.x - this.x() / tilesize, target.y - this.y() / tilesize);
     }
 
+    public Seq<Tile> getTouching(Building other) {
+        var touching = new Seq<Tile>();
+
+        Point2[] nearby = Edges.getEdges(block.size);
+        for (Point2 point : nearby) {
+            Building build = world.build(tile.x + point.x, tile.y + point.y);
+
+            if (build == null || build.team != team || other != build)
+                continue;
+
+            touching.add(world.tile(tile.x + point.x, tile.y + point.y));
+        }
+
+        return touching;
+    }
+
     // endregion
 }

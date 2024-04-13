@@ -135,30 +135,29 @@ public class Conveyor extends Block implements Autotiler {
 
     public class ConveyorBuild extends Building implements ChainedBuilding {
         // parallel array data
-        public Item[] ids = new Item[capacity];
+        public Item[] ids = new Item[capacity], ids2 = new Item[capacity];
         public float[] xs = new float[capacity], ys = new float[capacity];
+        public float[] xs2 = new float[capacity], ys2 = new float[capacity];
         // amount of items, always < capacity
-        public int len = 0;
+        public int len = 0, len2 = 0;
         // next entity
         public @Nullable Building next;
         public @Nullable ConveyorBuild nextc;
         // whether the next conveyor's rotation == tile rotation
         public boolean aligned;
 
-        public int lastInserted, mid;
-        public float minitem = 1;
+        public int lastInserted, mid, mid2;
+        public float minitem = size, minitem2 = size;
 
         public int blendbits, blending;
         public int blendsclx = 1, blendscly = 1;
 
-        public float clogHeat = 0f;
+        public float clogHeat = 0f, clogHeat2 = 0f;
 
         @Override
         public void draw() {
             int frame = enabled && clogHeat <= 0.5f ? (int) (((Time.time * speed * 8f * timeScale * efficiency)) % 4)
                     : 0;
-
-            // TODO Fix
 
             // draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -181,17 +180,45 @@ public class Conveyor extends Block implements Autotiler {
             Draw.z(Layer.block - 0.1f);
             float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
 
-            for (int i = 0; i < len; i++) {
-                Item item = ids[i];
-                Tmp.v1.trns(rotation * 90, tilesize, 0);
-                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
+            if (size == 1) {
+                for (int i = 0; i < len; i++) {
+                    Item item = ids[i];
+                    Tmp.v1.trns(rotation * 90, tilesize, 0);
+                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                float ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
-                        iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+                    float ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                            iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
 
-                // keep draw position deterministic.
-                Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
-                Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+                    // keep draw position deterministic.
+                    Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                    Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+                }
+            } else if (size == 2) {
+                for (int i = 0; i < len; i++) {
+                    Item item = ids[i];
+                    Tmp.v1.trns(rotation * 90, tilesize, 0);
+                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f - tilesize / 2);
+
+                    float ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                            iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+
+                    Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                    Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+                }
+
+                for (int i = 0; i < len2; i++) {
+                    Item item = ids2[i];
+                    Tmp.v1.trns(rotation * 90, tilesize, 0);
+                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs2[i] * tilesize / 2f + tilesize / 2);
+
+                    float ix = (x + Tmp.v1.x * ys2[i] + Tmp.v2.x),
+                            iy = (y + Tmp.v1.y * ys2[i] + Tmp.v2.y);
+
+                    Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                    Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
+                }
+            } else {
+                Log.err("Brainrot");
             }
         }
 
@@ -273,17 +300,18 @@ public class Conveyor extends Block implements Autotiler {
 
         @Override
         public void updateTile() {
-            minitem = 1f * size;
+            minitem = minitem2 = 1f * size;
             mid = 0;
 
             // skip updates if possible
-            if (len == 0) {
-                clogHeat = 0f;
+            if (len == 0 && len2 == 0) {
+                clogHeat = clogHeat2 = 0f;
                 sleep();
                 return;
             }
 
             float nextMax = aligned ? (1f * size) - Math.max(itemSpace - nextc.minitem, 0) : (1f * size);
+
             float moved = speed * edelta();
 
             for (int i = len - 1; i >= 0; i--) {
@@ -317,6 +345,41 @@ public class Conveyor extends Block implements Autotiler {
                 clogHeat = 0f;
             }
 
+            if (size == 2) {
+                float nextMax2 = aligned ? (1f * size) - Math.max(itemSpace - nextc.minitem2, 0) : (1f * size);
+
+                for (int i = len2 - 1; i >= 0; i--) {
+                    float nextpos = (i == len - 1 ? (100f * size) : ys2[i + 1]) - itemSpace;
+                    float maxmove = Mathf.clamp(nextpos - ys2[i], 0, moved);
+
+                    ys2[i] += maxmove;
+
+                    if (ys2[i] > nextMax2)
+                        ys2[i] = nextMax2;
+                    if (ys2[i] > ((float) size) / 2 && i > 0)
+                        mid2 = i - 1;
+                    xs2[i] = Mathf.approach(xs2[i], 0, moved * 2);
+
+                    if (ys2[i] >= (float) size && pass(ids2[i])) {
+                        // align X position if passing forwards
+                        if (aligned) {
+                            nextc.xs2[nextc.lastInserted] = xs2[i];
+                        }
+                        // remove last item
+                        items.remove(ids2[i], len - i);
+                        len2 = Math.min(i, len2);
+                    } else if (ys2[i] < minitem) {
+                        minitem = ys2[i];
+                    }
+                }
+
+                if (minitem2 < itemSpace + (blendbits == 1 ? 0.3f : 0f)) {
+                    clogHeat2 = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
+                } else {
+                    clogHeat2 = 0f;
+                }
+            }
+
             noSleep();
         }
 
@@ -341,6 +404,13 @@ public class Conveyor extends Block implements Autotiler {
                         break;
                     }
                 }
+                for (int i = 0; i < len2; i++) {
+                    if (ids2[i] == item) {
+                        remove2(i);
+                        removed++;
+                        break;
+                    }
+                }
             }
 
             items.remove(item, removed);
@@ -354,19 +424,35 @@ public class Conveyor extends Block implements Autotiler {
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source) {
-            return Math.min((int) (minitem / itemSpace), amount);
+            return Math.min((int) ((minitem / itemSpace) + (minitem2 / itemSpace)), amount);
         }
 
         @Override
         public void handleStack(Item item, int amount, Teamc source) {
-            amount = Math.min(amount, capacity - len);
+            amount = Math.min(amount, capacity * 2 - len - len2);
 
-            for (int i = amount - 1; i >= 0; i--) {
-                add(0);
-                xs[0] = 0;
-                ys[0] = i * itemSpace;
-                ids[0] = item;
-                items.add(item, 1);
+            var beltNo = 0;
+            for (int i = amount - 1; i >= 0;) {
+                if (beltNo == 0) {
+                    if (len - 1 != capacity) {
+                        add(0);
+                        xs[0] = 0;
+                        ys[0] = i * itemSpace;
+                        ids[0] = item;
+                        items.add(item, 1);
+                        i -= 1;
+                    }
+                } else {
+                    if (len2 - 1 != capacity) {
+                        add2(0);
+                        xs2[0] = 0;
+                        ys2[0] = i * itemSpace;
+                        ids2[0] = item;
+                        items.add(item, 1);
+                        i -= 1;
+                    }
+                }
+                beltNo = beltNo == 0 ? 1 : 0;
             }
 
             noSleep();
@@ -374,8 +460,6 @@ public class Conveyor extends Block implements Autotiler {
 
         @Override
         public boolean acceptItem(Building source, Item item) {
-            if (len >= capacity)
-                return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
             if (facing == null)
                 return false;
@@ -383,54 +467,134 @@ public class Conveyor extends Block implements Autotiler {
             int direction;
             if (size == 1) {
                 direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
-            } else {
-                Vec2 relCoords = this.getRelCoords(facing);
-                var angle = Mathf.angle(relCoords.x, relCoords.y) + 45f + 180f; // Math
 
-                direction = Mathf.floor(angle / 90) % 4;
+                var toSide = direction % 2 == 1;
+                var facingFront = direction == 0;
+
+                var dir1 = (facingFront && minitem >= itemSpace);
+                var dir2 = (toSide && minitem > 0.7f);
+
+                var dirCond = dir1 || dir2;
+                var sameCond = (boolean) !(source.block.rotate && next == source);
+
+                return dirCond && sameCond && len < capacity;
+            } else if (size == 2) {
+                return checkCapacity(source);
+            }
+            return false; // brainrot
+        }
+
+        public boolean checkCapacity(Building source) {
+            Tile facing = Edges.getFacingEdge(source.tile, tile);
+            Vec2 relCoords = this.getRelCoords(facing);
+
+            var direction = getDirFromRel(relCoords);
+
+            if (direction == 0) {
+                return false;
+            } else {
+                if (this.getTouching(source).size == 1) {
+                    return (this.leftBelt(relCoords) ? len : len2) < capacity;
+                } else {
+                    return len < capacity || len2 < capacity;
+                }
+            }
+        }
+
+        public int getDirFromRel(Vec2 vector) {
+            var angle = Mathf.angle(vector.x, vector.y) + 45f + 180f; // Math
+            return (Mathf.floor(angle / 90) % 4) - rotation;
+        }
+
+        public boolean leftBelt(Vec2 relCoords) {
+            boolean isLeftBelt;
+
+            if (rotation % 2 == 0) {// Horizontal
+                isLeftBelt = (relCoords.y > 0) ^ rotation == 2;
+            } else {
+                isLeftBelt = (relCoords.x < 0) ^ rotation == 3;
             }
 
-            Log.info(direction);
-
-            var toSide = direction % 2 == 1;
-            var facingFront = direction == 0;
-
-            var dir1 = (facingFront && minitem >= itemSpace);
-            var dir2 = (toSide && minitem > 0.7f);
-
-            var dirCond = dir1 || dir2;
-            var sameCond = (boolean) !(source.block.rotate && next == source);
-
-            return dirCond && sameCond;
+            return isLeftBelt;
         }
 
         @Override
         public void handleItem(Building source, Item item) {
-            if (len >= capacity)
-                return;
+            if (size == 1) {
+                if (len >= capacity)
+                    return;
 
-            int r = rotation;
-            Tile facing = Edges.getFacingEdge(source.tile, tile);
+                int r = rotation;
+                Tile facing = Edges.getFacingEdge(source.tile, tile);
 
-            Draw.z(Layer.block + 1);
+                Draw.z(Layer.block + 1);
 
-            int ang = ((facing.relativeTo(tile.x, tile.y) - r));
-            float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
+                int ang = ((facing.relativeTo(tile.x, tile.y) - r));
+                float x = (ang == -1 || ang == 3) ? 1 : (ang == 1 || ang == -3) ? -1 : 0;
 
-            noSleep();
-            items.add(item, 1);
+                noSleep();
+                items.add(item, 1);
 
-            if (Math.abs(facing.relativeTo(tile.x, tile.y) - r) == 0) { // idx = 0
-                add(0);
-                xs[0] = x;
-                ys[0] = 0;
-                ids[0] = item;
-            } else { // idx = mid
-                add(mid);
-                xs[mid] = x;
-                ys[mid] = ((float) size) / 2;
-                ids[mid] = item;
+                if (Math.abs(facing.relativeTo(tile.x, tile.y) - r) == 0) { // idx = 0
+                    add(0);
+                    xs[0] = x;
+                    ys[0] = 0;
+                    ids[0] = item;
+                } else { // idx = mid
+                    add(mid);
+                    xs[mid] = x;
+                    ys[mid] = ((float) size) / 2;
+                    ids[mid] = item;
+                }
+            } else if (size == 2) {
+                if (!checkCapacity(source)) {
+                    return;
+                }
+
+                Draw.z(Layer.block + 1);
+
+                var touching = this.getTouching(source);
+                var sourceTile = touching.get(Mathf.random(0, touching.size - 1));
+                var relCoords = this.getRelCoords(sourceTile);
+                var onLeftBelt = this.leftBelt(relCoords);
+
+                if (onLeftBelt) {
+                    float x = getDirFromRel(relCoords) == 0 ? 0f : -1f;
+
+                    noSleep();
+                    items.add(item, 1);
+
+                    if (x == 0) { // idx = 0
+                        add(0);
+                        xs[0] = x;
+                        ys[0] = 0;
+                        ids[0] = item;
+                    } else {
+                        add(mid);
+                        xs[mid] = x;
+                        ys[mid] = ((float) size) / 2; // TODO: Fix
+                        ids[mid] = item;
+                    }
+                } else {
+                    float x = getDirFromRel(relCoords) == 0 ? 0f : 1f;
+
+                    noSleep();
+                    items.add(item, 1);
+
+                    if (x == 0) { // idx = 0
+                        add2(0);
+                        xs2[0] = x;
+                        ys2[0] = 0;
+                        ids2[0] = item;
+                    } else {
+                        add2(mid);
+                        xs2[mid] = x;
+                        ys2[mid] = ((float) size) / 2; // TODO: Fix
+                        ids2[mid] = item;
+                    }
+                }
             }
+
         }
 
         @Override
@@ -482,11 +646,31 @@ public class Conveyor extends Block implements Autotiler {
             len++;
         }
 
+        public final void add2(int o) {
+            for (int i = Math.max(o + 1, len2); i > o; i--) {
+                ids2[i] = ids2[i - 1];
+                xs2[i] = xs2[i - 1];
+                ys2[i] = ys2[i - 1];
+            }
+
+            len++;
+        }
+
         public final void remove(int o) {
             for (int i = o; i < len - 1; i++) {
                 ids[i] = ids[i + 1];
                 xs[i] = xs[i + 1];
                 ys[i] = ys[i + 1];
+            }
+
+            len--;
+        }
+
+        public final void remove2(int o) {
+            for (int i = o; i < len2 - 1; i++) {
+                ids2[2] = ids2[i + 1];
+                xs2[i] = xs2[i + 1];
+                ys2[i] = ys2[i + 1];
             }
 
             len--;
