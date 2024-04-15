@@ -412,10 +412,10 @@ public class Conveyor extends Block implements Autotiler {
                     vec.y -= 0.5f;
 
                     if (vec.y < -1) {
-                        return false;
+                        // return false;
                     }
 
-                    ((ConveyorBuild) next).handleItem(this, item, side + Mathf.round(vec.y));
+                    ((ConveyorBuild) next).handleItem(this, item, side + (side + Mathf.round(vec.y)) * 0);
                 } else {
                     next.handleItem(this, item);
                 }
