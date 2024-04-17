@@ -8,7 +8,7 @@ Just contact me @leomathguy (discord)
 
 ## Getting
 
-Just look in releases lol.
+Just look in releases lmao
 
 ### Windows
 
@@ -24,7 +24,7 @@ _Sprite Packing:_ `./gradlew tools:pack`
 
 ### Android
 
-No if you want it, build it. Im not installing android SDK, and the huge maps will probably make mobile unplayable.
+Figure it out yourself
 
 ### Troubleshooting
 
