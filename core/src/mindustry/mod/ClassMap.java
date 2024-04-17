@@ -1,12 +1,16 @@
 package mindustry.mod;
 
 import arc.struct.*;
-/** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
+
+/**
+ * Generated class. Maps simple class names to concrete classes. For use in JSON
+ * mods.
+ */
 @SuppressWarnings("deprecation")
-public class ClassMap{
+public class ClassMap {
     public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();
 
-    static{
+    static {
         classes.put("AssemblerAI", mindustry.ai.types.AssemblerAI.class);
         classes.put("BoostAI", mindustry.ai.types.BoostAI.class);
         classes.put("BuilderAI", mindustry.ai.types.BuilderAI.class);
@@ -153,7 +157,8 @@ public class ClassMap{
         classes.put("BuildTurret", mindustry.world.blocks.defense.BuildTurret.class);
         classes.put("BuildTurretBuild", mindustry.world.blocks.defense.BuildTurret.BuildTurretBuild.class);
         classes.put("DirectionalForceProjector", mindustry.world.blocks.defense.DirectionalForceProjector.class);
-        classes.put("DirectionalForceProjectorBuild", mindustry.world.blocks.defense.DirectionalForceProjector.DirectionalForceProjectorBuild.class);
+        classes.put("DirectionalForceProjectorBuild",
+                mindustry.world.blocks.defense.DirectionalForceProjector.DirectionalForceProjectorBuild.class);
         classes.put("Door", mindustry.world.blocks.defense.Door.class);
         classes.put("DoorBuild", mindustry.world.blocks.defense.Door.DoorBuild.class);
         classes.put("ForceProjector", mindustry.world.blocks.defense.ForceProjector.class);
@@ -179,9 +184,11 @@ public class ClassMap{
         classes.put("BaseTurret", mindustry.world.blocks.defense.turrets.BaseTurret.class);
         classes.put("BaseTurretBuild", mindustry.world.blocks.defense.turrets.BaseTurret.BaseTurretBuild.class);
         classes.put("ContinuousLiquidTurret", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.class);
-        classes.put("ContinuousLiquidTurretBuild", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild.class);
+        classes.put("ContinuousLiquidTurretBuild",
+                mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.ContinuousLiquidTurretBuild.class);
         classes.put("ContinuousTurret", mindustry.world.blocks.defense.turrets.ContinuousTurret.class);
-        classes.put("ContinuousTurretBuild", mindustry.world.blocks.defense.turrets.ContinuousTurret.ContinuousTurretBuild.class);
+        classes.put("ContinuousTurretBuild",
+                mindustry.world.blocks.defense.turrets.ContinuousTurret.ContinuousTurretBuild.class);
         classes.put("ItemTurret", mindustry.world.blocks.defense.turrets.ItemTurret.class);
         classes.put("ItemEntry", mindustry.world.blocks.defense.turrets.ItemTurret.ItemEntry.class);
         classes.put("ItemTurretBuild", mindustry.world.blocks.defense.turrets.ItemTurret.ItemTurretBuild.class);
@@ -190,32 +197,40 @@ public class ClassMap{
         classes.put("LiquidTurret", mindustry.world.blocks.defense.turrets.LiquidTurret.class);
         classes.put("LiquidTurretBuild", mindustry.world.blocks.defense.turrets.LiquidTurret.LiquidTurretBuild.class);
         classes.put("PayloadAmmoTurret", mindustry.world.blocks.defense.turrets.PayloadAmmoTurret.class);
-        classes.put("PayloadTurretBuild", mindustry.world.blocks.defense.turrets.PayloadAmmoTurret.PayloadTurretBuild.class);
+        classes.put("PayloadTurretBuild",
+                mindustry.world.blocks.defense.turrets.PayloadAmmoTurret.PayloadTurretBuild.class);
         classes.put("PointDefenseTurret", mindustry.world.blocks.defense.turrets.PointDefenseTurret.class);
-        classes.put("PointDefenseBuild", mindustry.world.blocks.defense.turrets.PointDefenseTurret.PointDefenseBuild.class);
+        classes.put("PointDefenseBuild",
+                mindustry.world.blocks.defense.turrets.PointDefenseTurret.PointDefenseBuild.class);
         classes.put("PowerTurret", mindustry.world.blocks.defense.turrets.PowerTurret.class);
         classes.put("PowerTurretBuild", mindustry.world.blocks.defense.turrets.PowerTurret.PowerTurretBuild.class);
         classes.put("ReloadTurret", mindustry.world.blocks.defense.turrets.ReloadTurret.class);
         classes.put("ReloadTurretBuild", mindustry.world.blocks.defense.turrets.ReloadTurret.ReloadTurretBuild.class);
         classes.put("TractorBeamTurret", mindustry.world.blocks.defense.turrets.TractorBeamTurret.class);
-        classes.put("TractorBeamBuild", mindustry.world.blocks.defense.turrets.TractorBeamTurret.TractorBeamBuild.class);
+        classes.put("TractorBeamBuild",
+                mindustry.world.blocks.defense.turrets.TractorBeamTurret.TractorBeamBuild.class);
         classes.put("Turret", mindustry.world.blocks.defense.turrets.Turret.class);
         classes.put("AmmoEntry", mindustry.world.blocks.defense.turrets.Turret.AmmoEntry.class);
         classes.put("BulletEntry", mindustry.world.blocks.defense.turrets.Turret.BulletEntry.class);
         classes.put("TurretBuild", mindustry.world.blocks.defense.turrets.Turret.TurretBuild.class);
-        classes.put("ArmoredConveyor", mindustry.world.blocks.distribution.ArmoredConveyor.class);
-        classes.put("ArmoredConveyorBuild", mindustry.world.blocks.distribution.ArmoredConveyor.ArmoredConveyorBuild.class);
+        // classes.put("ArmoredConveyor",
+        // mindustry.world.blocks.distribution.ArmoredConveyor.class);
+        // classes.put("ArmoredConveyorBuild",
+        // mindustry.world.blocks.distribution.ArmoredConveyor.ArmoredConveyorBuild.class);
         classes.put("BufferedItemBridge", mindustry.world.blocks.distribution.BufferedItemBridge.class);
-        classes.put("BufferedItemBridgeBuild", mindustry.world.blocks.distribution.BufferedItemBridge.BufferedItemBridgeBuild.class);
+        classes.put("BufferedItemBridgeBuild",
+                mindustry.world.blocks.distribution.BufferedItemBridge.BufferedItemBridgeBuild.class);
         classes.put("ChainedBuilding", mindustry.world.blocks.distribution.ChainedBuilding.class);
         classes.put("Conveyor", mindustry.world.blocks.distribution.Conveyor.class);
         classes.put("ConveyorBuild", mindustry.world.blocks.distribution.Conveyor.ConveyorBuild.class);
         classes.put("DirectionBridge", mindustry.world.blocks.distribution.DirectionBridge.class);
-        classes.put("DirectionBridgeBuild", mindustry.world.blocks.distribution.DirectionBridge.DirectionBridgeBuild.class);
+        classes.put("DirectionBridgeBuild",
+                mindustry.world.blocks.distribution.DirectionBridge.DirectionBridgeBuild.class);
         classes.put("DirectionLiquidBridge", mindustry.world.blocks.distribution.DirectionLiquidBridge.class);
         classes.put("DuctBridgeBuild", mindustry.world.blocks.distribution.DirectionLiquidBridge.DuctBridgeBuild.class);
         classes.put("DirectionalUnloader", mindustry.world.blocks.distribution.DirectionalUnloader.class);
-        classes.put("DirectionalUnloaderBuild", mindustry.world.blocks.distribution.DirectionalUnloader.DirectionalUnloaderBuild.class);
+        classes.put("DirectionalUnloaderBuild",
+                mindustry.world.blocks.distribution.DirectionalUnloader.DirectionalUnloaderBuild.class);
         classes.put("Duct", mindustry.world.blocks.distribution.Duct.class);
         classes.put("DuctBuild", mindustry.world.blocks.distribution.Duct.DuctBuild.class);
         classes.put("DuctBridge", mindustry.world.blocks.distribution.DuctBridge.class);
@@ -272,7 +287,8 @@ public class ClassMap{
         classes.put("LegacyMechPad", mindustry.world.blocks.legacy.LegacyMechPad.class);
         classes.put("LegacyMechPadBuild", mindustry.world.blocks.legacy.LegacyMechPad.LegacyMechPadBuild.class);
         classes.put("LegacyUnitFactory", mindustry.world.blocks.legacy.LegacyUnitFactory.class);
-        classes.put("LegacyUnitFactoryBuild", mindustry.world.blocks.legacy.LegacyUnitFactory.LegacyUnitFactoryBuild.class);
+        classes.put("LegacyUnitFactoryBuild",
+                mindustry.world.blocks.legacy.LegacyUnitFactory.LegacyUnitFactoryBuild.class);
         classes.put("ArmoredConduit", mindustry.world.blocks.liquid.ArmoredConduit.class);
         classes.put("ArmoredConduitBuild", mindustry.world.blocks.liquid.ArmoredConduit.ArmoredConduitBuild.class);
         classes.put("Conduit", mindustry.world.blocks.liquid.Conduit.class);
@@ -310,13 +326,15 @@ public class ClassMap{
         classes.put("PayloadConveyor", mindustry.world.blocks.payloads.PayloadConveyor.class);
         classes.put("PayloadConveyorBuild", mindustry.world.blocks.payloads.PayloadConveyor.PayloadConveyorBuild.class);
         classes.put("PayloadDeconstructor", mindustry.world.blocks.payloads.PayloadDeconstructor.class);
-        classes.put("PayloadDeconstructorBuild", mindustry.world.blocks.payloads.PayloadDeconstructor.PayloadDeconstructorBuild.class);
+        classes.put("PayloadDeconstructorBuild",
+                mindustry.world.blocks.payloads.PayloadDeconstructor.PayloadDeconstructorBuild.class);
         classes.put("PayloadLoader", mindustry.world.blocks.payloads.PayloadLoader.class);
         classes.put("PayloadLoaderBuild", mindustry.world.blocks.payloads.PayloadLoader.PayloadLoaderBuild.class);
         classes.put("PayloadMassDriver", mindustry.world.blocks.payloads.PayloadMassDriver.class);
         classes.put("PayloadDriverBuild", mindustry.world.blocks.payloads.PayloadMassDriver.PayloadDriverBuild.class);
         classes.put("PayloadDriverState", mindustry.world.blocks.payloads.PayloadMassDriver.PayloadDriverState.class);
-        classes.put("PayloadMassDriverData", mindustry.world.blocks.payloads.PayloadMassDriver.PayloadMassDriverData.class);
+        classes.put("PayloadMassDriverData",
+                mindustry.world.blocks.payloads.PayloadMassDriver.PayloadMassDriverData.class);
         classes.put("PayloadRouter", mindustry.world.blocks.payloads.PayloadRouter.class);
         classes.put("PayloadRouterBuild", mindustry.world.blocks.payloads.PayloadRouter.PayloadRouterBuild.class);
         classes.put("PayloadSource", mindustry.world.blocks.payloads.PayloadSource.class);
@@ -358,7 +376,8 @@ public class ClassMap{
         classes.put("VariableReactor", mindustry.world.blocks.power.VariableReactor.class);
         classes.put("VariableReactorBuild", mindustry.world.blocks.power.VariableReactor.VariableReactorBuild.class);
         classes.put("AttributeCrafter", mindustry.world.blocks.production.AttributeCrafter.class);
-        classes.put("AttributeCrafterBuild", mindustry.world.blocks.production.AttributeCrafter.AttributeCrafterBuild.class);
+        classes.put("AttributeCrafterBuild",
+                mindustry.world.blocks.production.AttributeCrafter.AttributeCrafterBuild.class);
         classes.put("BeamDrill", mindustry.world.blocks.production.BeamDrill.class);
         classes.put("BeamDrillBuild", mindustry.world.blocks.production.BeamDrill.BeamDrillBuild.class);
         classes.put("BurstDrill", mindustry.world.blocks.production.BurstDrill.class);
@@ -374,13 +393,15 @@ public class ClassMap{
         classes.put("Incinerator", mindustry.world.blocks.production.Incinerator.class);
         classes.put("IncineratorBuild", mindustry.world.blocks.production.Incinerator.IncineratorBuild.class);
         classes.put("ItemIncinerator", mindustry.world.blocks.production.ItemIncinerator.class);
-        classes.put("ItemIncineratorBuild", mindustry.world.blocks.production.ItemIncinerator.ItemIncineratorBuild.class);
+        classes.put("ItemIncineratorBuild",
+                mindustry.world.blocks.production.ItemIncinerator.ItemIncineratorBuild.class);
         classes.put("Pump", mindustry.world.blocks.production.Pump.class);
         classes.put("PumpBuild", mindustry.world.blocks.production.Pump.PumpBuild.class);
         classes.put("Separator", mindustry.world.blocks.production.Separator.class);
         classes.put("SeparatorBuild", mindustry.world.blocks.production.Separator.SeparatorBuild.class);
         classes.put("SingleBlockProducer", mindustry.world.blocks.production.SingleBlockProducer.class);
-        classes.put("SingleBlockProducerBuild", mindustry.world.blocks.production.SingleBlockProducer.SingleBlockProducerBuild.class);
+        classes.put("SingleBlockProducerBuild",
+                mindustry.world.blocks.production.SingleBlockProducer.SingleBlockProducerBuild.class);
         classes.put("SolidPump", mindustry.world.blocks.production.SolidPump.class);
         classes.put("SolidPumpBuild", mindustry.world.blocks.production.SolidPump.SolidPumpBuild.class);
         classes.put("WallCrafter", mindustry.world.blocks.production.WallCrafter.class);
@@ -417,13 +438,16 @@ public class ClassMap{
         classes.put("UnitAssemblerBuild", mindustry.world.blocks.units.UnitAssembler.UnitAssemblerBuild.class);
         classes.put("YeetData", mindustry.world.blocks.units.UnitAssembler.YeetData.class);
         classes.put("UnitAssemblerModule", mindustry.world.blocks.units.UnitAssemblerModule.class);
-        classes.put("UnitAssemblerModuleBuild", mindustry.world.blocks.units.UnitAssemblerModule.UnitAssemblerModuleBuild.class);
+        classes.put("UnitAssemblerModuleBuild",
+                mindustry.world.blocks.units.UnitAssemblerModule.UnitAssemblerModuleBuild.class);
         classes.put("UnitBlock", mindustry.world.blocks.units.UnitBlock.class);
         classes.put("UnitBuild", mindustry.world.blocks.units.UnitBlock.UnitBuild.class);
         classes.put("UnitCargoLoader", mindustry.world.blocks.units.UnitCargoLoader.class);
-        classes.put("UnitTransportSourceBuild", mindustry.world.blocks.units.UnitCargoLoader.UnitTransportSourceBuild.class);
+        classes.put("UnitTransportSourceBuild",
+                mindustry.world.blocks.units.UnitCargoLoader.UnitTransportSourceBuild.class);
         classes.put("UnitCargoUnloadPoint", mindustry.world.blocks.units.UnitCargoUnloadPoint.class);
-        classes.put("UnitCargoUnloadPointBuild", mindustry.world.blocks.units.UnitCargoUnloadPoint.UnitCargoUnloadPointBuild.class);
+        classes.put("UnitCargoUnloadPointBuild",
+                mindustry.world.blocks.units.UnitCargoUnloadPoint.UnitCargoUnloadPointBuild.class);
         classes.put("UnitFactory", mindustry.world.blocks.units.UnitFactory.class);
         classes.put("UnitFactoryBuild", mindustry.world.blocks.units.UnitFactory.UnitFactoryBuild.class);
         classes.put("UnitPlan", mindustry.world.blocks.units.UnitFactory.UnitPlan.class);

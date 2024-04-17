@@ -2341,7 +2341,7 @@ public class Blocks {
         // endregion
         // region distribution
 
-        conveyor = new ArmoredConveyor("conveyor") {
+        conveyor = new Conveyor("conveyor") {
             {
                 requirements(Category.distribution, with(Items.copper, 8));
                 health = 200;
@@ -2351,34 +2351,6 @@ public class Blocks {
                 researchCost = with(Items.copper, 25);
 
                 size = 2;
-                setCapacity(6);
-            }
-        };
-
-        titaniumConveyor = new Conveyor("titanium-conveyor") {
-            {
-                requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
-                health = 65;
-                speed = 0.08f;
-                displayedSpeed = 11f;
-            }
-        };
-
-        plastaniumConveyor = new StackConveyor("plastanium-conveyor") {
-            {
-                requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
-                health = 75;
-                speed = 4f / 60f;
-                itemCapacity = 10;
-            }
-        };
-
-        armoredConveyor = new ArmoredConveyor("armored-conveyor") {
-            {
-                requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
-                health = 180;
-                speed = 0.08f;
-                displayedSpeed = 11f;
             }
         };
 

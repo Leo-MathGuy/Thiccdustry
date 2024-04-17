@@ -2296,7 +2296,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Vec2 getRelCoords(Tile target) {
-        return new Vec2(target.x - this.x() / tilesize, target.y - this.y() / tilesize);
+        return new Vec2(target.x - this.x / tilesize, target.y - this.y / tilesize);
     }
 
     public Seq<Tile> getTouching(Building other) {
@@ -2313,6 +2313,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         return touching;
+    }
+
+    public Vec2 getRelOffset(Building target) {
+        return new Vec2((target.x - this.x) / tilesize, (target.y - this.y) / tilesize);
     }
 
     // endregion
