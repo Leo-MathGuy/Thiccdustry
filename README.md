@@ -24,7 +24,7 @@ _Sprite Packing:_ `./gradlew tools:pack`
 
 ### Android
 
-no
+No if you want it, build it. Im not installing android SDK, and the huge maps will probably make mobile unplayable.
 
 ### Troubleshooting
 
