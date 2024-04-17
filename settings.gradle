@@ -11,9 +11,26 @@ def use = { ... names ->
     }
 }
 
+def hasSdk = System.getenv("ANDROID_HOME") != null
+
 if(new File(settingsDir, 'local.properties').exists()){
 	def properties = new Properties()
 	properties.load(new File(settingsDir, 'local.properties').newDataInputStream())
+	if(properties.containsKey("sdk.dir")) hasSdk = true
+}
+
+if(System.getenv("JITPACK") == "true") hasSdk = false
+
+if(hasSdk){
+    //hack: pretend the Android module doesn't exist when imported through IntelliJ
+    //why? because IntelliJ chokes on the new version of the Android plugin
+
+    //UPDATE: it no longer chokes on AGP with the latest version, but instead gives a completely different error. brilliant.
+    if(!System.getProperty("jna.tmpdir")?.contains("JetBrains")){
+        include 'android'
+    }
+}else{
+    println("No Android SDK found. Skipping Android module.")
 }
 
 if(!hasProperty("release") && !hasProperty("noLocalArc")){

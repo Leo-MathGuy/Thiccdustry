@@ -28,7 +28,6 @@ buildscript{
 plugins{
     id "org.jetbrains.kotlin.jvm" version "1.6.0"
     id "org.jetbrains.kotlin.kapt" version "1.6.0"
-    id "com.github.mrsarm.jshell.plugin" version "1.2.1"
 }
 
 allprojects{
@@ -92,6 +91,16 @@ allprojects{
 
         getPackage = {
             return project.ext.mainClassName.substring(0, project.ext.mainClassName.indexOf("desktop") - 1)
+        }
+
+        findSdkDir = {
+            //null because IntelliJ doesn't get env variables
+            def v = System.getenv("ANDROID_HOME")
+            if(v != null) return v
+            //rootDir is null here, amazing. brilliant.
+            def file = new File(rootDir, "local.properties")
+            def props = new Properties().with{p -> p.load(file.newReader()); return p }
+            return props.get("sdk.dir")
         }
 
         generateLocales = {
@@ -258,6 +267,30 @@ project(":core"){
         writePlugins()
     }
 
+    task copyChangelog{
+        doLast{
+            def props = loadVersionProps()
+            def androidVersion = props['androidBuildCode'].toInteger() - 2
+            def loglines = file("../changelog").text.split("\n")
+            def notice = "[This is a truncated changelog, see Github for full notes]"
+            def maxLength = 460
+
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
+            def result = ""
+            androidLogList.forEach{line ->
+                if(result.length() + line.length() + 1 < maxLength){
+                    result += line + "\n"
+                }
+            }
+            def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
+            changelogs.mkdirs()
+            try{
+                new File(changelogs, androidVersion + ".txt").text = (result)
+            }catch(Exception ignored){
+            }
+        }
+    }
+
     task sourcesJar(type: Jar, dependsOn: classes){
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
@@ -299,6 +332,9 @@ project(":core"){
     afterEvaluate{
         task mergedJavadoc(type: Javadoc){
             def blacklist = [project(":ios"), project(":desktop"), project(":server"), project(":annotations")]
+            if(findProject(":android") != null){
+                blacklist += project(":android")
+            }
 
             source rootProject.subprojects.collect{ project ->
                 if(!blacklist.contains(project) && project.hasProperty("sourceSets")){
@@ -419,6 +455,7 @@ task deployAll{
     dependsOn "desktop:packrMacOS"
     if(versionModifier != "steam"){
         dependsOn "server:deploy"
+        dependsOn "android:deploy"
     }
 }
 
