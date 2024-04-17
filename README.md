@@ -24,7 +24,7 @@ _Sprite Packing:_ `./gradlew tools:pack`
 
 ### Android
 
-Figure it out yourself
+Figure it out yourself, I add unsigned sdks in releases
 
 ### Troubleshooting
 
