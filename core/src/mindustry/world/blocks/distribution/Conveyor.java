@@ -86,13 +86,6 @@ public class Conveyor extends Block implements Autotiler {
                 region.height * bits[2] * region.scl(), plan.rotation * 90);
     }
 
-    @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return (otherblock.outputsItems()
-                || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
-                && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
-    }
-
     // stack conveyors should be bridged over, not replaced
     @Override
     public boolean canReplace(Block other) {
@@ -116,6 +109,11 @@ public class Conveyor extends Block implements Autotiler {
     public boolean isAccessible() {
         return true;
     }
+
+    @Override
+    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
+        return false;
+    };
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans) {
@@ -373,15 +371,26 @@ public class Conveyor extends Block implements Autotiler {
             return !clogged();
         }
 
+        public int[] buildBlending() {
+            int[] blendresult = new int[3];
+
+            blendresult[0] = 0;
+            blendresult[1] = blendresult[2] = 1;
+
+            for (Building near : proximity) {
+            }
+
+            return blendresult;
+        }
+
         @Override
         public void onProximityUpdate() {
             super.onProximityUpdate();
 
-            int[] bits = buildBlending(tile, rotation, null, true);
+            int[] bits = buildBlending();
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
-            blending = bits[4];
 
             var thisX = x / tilesize;
             var thisY = y / tilesize;
@@ -497,6 +506,7 @@ public class Conveyor extends Block implements Autotiler {
         @Override
         public int removeStack(Item item, int amount) {
             noSleep();
+
             int removed = 0;
 
             var curBelt = 0;
