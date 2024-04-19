@@ -8,8 +8,11 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
-/** An extended BulletType for most ammo-based bullets shot from turrets and units. Draws 1-2 sprites that can spin or shrink. */
-public class BasicBulletType extends BulletType{
+/**
+ * An extended BulletType for most ammo-based bullets shot from turrets and
+ * units. Draws 1-2 sprites that can spin or shrink.
+ */
+public class BasicBulletType extends BulletType {
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public Color mixColorFrom = new Color(1f, 1f, 1f, 0f), mixColorTo = new Color(1f, 1f, 1f, 0f);
     public float width = 5f, height = 7f;
@@ -21,23 +24,24 @@ public class BasicBulletType extends BulletType{
 
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
+    public boolean drawBack = true;
 
-    public BasicBulletType(float speed, float damage, String bulletSprite){
+    public BasicBulletType(float speed, float damage, String bulletSprite) {
         super(speed, damage);
         this.sprite = bulletSprite;
     }
-    
-    public BasicBulletType(float speed, float damage){
+
+    public BasicBulletType(float speed, float damage) {
         this(speed, damage, "bullet");
     }
 
     /** For mods. */
-    public BasicBulletType(){
+    public BasicBulletType() {
         this(1f, 1f, "bullet");
     }
 
     @Override
-    public void load(){
+    public void load() {
         super.load();
 
         backRegion = Core.atlas.find(backSprite == null ? (sprite + "-back") : backSprite);
@@ -45,7 +49,7 @@ public class BasicBulletType extends BulletType{
     }
 
     @Override
-    public void draw(Bullet b){
+    public void draw(Bullet b) {
         super.draw(b);
         float shrink = shrinkInterp.apply(b.fout());
         float height = this.height * ((1f - shrinkY) + shrinkY * shrink);
@@ -56,7 +60,7 @@ public class BasicBulletType extends BulletType{
 
         Draw.mixcol(mix, mix.a);
 
-        if(backRegion.found()){
+        if (backRegion.found() && drawBack) {
             Draw.color(backColor);
             Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
         }

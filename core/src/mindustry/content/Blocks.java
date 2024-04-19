@@ -3693,7 +3693,7 @@ public class Blocks {
             {
                 requirements(Category.turret, with(Items.copper, 35));
                 ammo(
-                        Items.copper, new BasicBulletType(5f, 100) {
+                        Items.copper, new BasicBulletType(5f, 50) {
                             {
                                 width = 14f;
                                 height = 17f;
@@ -3701,7 +3701,7 @@ public class Blocks {
                                 ammoMultiplier = 1;
                             }
                         },
-                        Items.graphite, new BasicBulletType(3f, 150) {
+                        Items.graphite, new BasicBulletType(3f, 75) {
                             {
                                 width = 14f;
                                 height = 15f;
@@ -3710,7 +3710,7 @@ public class Blocks {
                                 lifetime = 60f;
                             }
                         },
-                        Items.silicon, new BasicBulletType(6f, 125) {
+                        Items.silicon, new BasicBulletType(6f, 60) {
                             {
                                 width = 12f;
                                 height = 18f;

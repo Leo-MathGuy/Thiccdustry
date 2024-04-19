@@ -32,7 +32,6 @@ plugins{
 
 allprojects{
     apply plugin: 'maven-publish'
-    apply plugin: 'java'
     
     version = project.hasProperty("packageVersion") ? project.getProperty("packageVersion") : 'release'
     group = 'com.github.Anuken'
