@@ -2316,7 +2316,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Vec2 getRelOffset(Building target) {
-        return new Vec2((target.x - this.x) / tilesize, (target.y - this.y) / tilesize);
+        var result = new Vec2((target.x - this.x) / tilesize, (target.y - this.y) / tilesize);
+        return result;
     }
 
     // endregion

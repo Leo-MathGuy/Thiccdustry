@@ -1,6 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import java.lang.Math;
+import java.util.Arrays;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
@@ -25,7 +26,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class Conveyor extends Block implements Autotiler {
+public class Conveyor extends Block {
     private static final float itemSpace = 0.4f;
     private static int perBeltCap = 6;
 
@@ -76,7 +77,7 @@ public class Conveyor extends Block implements Autotiler {
 
     @Override
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
-        int[] bits = getTiling(plan, list);
+        int[] bits = new int[] { 0, 1, 1, 0, 0 };
 
         if (bits == null)
             return;
@@ -109,11 +110,6 @@ public class Conveyor extends Block implements Autotiler {
     public boolean isAccessible() {
         return true;
     }
-
-    @Override
-    public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock) {
-        return false;
-    };
 
     @Override
     public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans) {
@@ -158,26 +154,33 @@ public class Conveyor extends Block implements Autotiler {
                 // aligned ? (1f * size) - Math.max(itemSpace - nextc.minitem2, 0) : (1f * size)
                 // ;
 
-                float convEnd = 2f;
+                boolean rotating = blendbits == 1;
+                boolean rotin = rotating && side == innerBelt;
+                boolean rotout = rotating && side != innerBelt;
 
+                float convEnd = 2f;
+                var actualSpace = itemSpace * (rotout ? 1.5f : 1);
                 if (inFront != null && inFront.rotation == rotation)
                     label1: {
+
                         if (nextc != null) {
-                            convEnd = 2f - Math.max(itemSpace - nextc.belts[side].minitem, 0);
+                            convEnd = 2f - Math.max(actualSpace - nextc.belts[side].minitem, 0);
                             break label1;
                         }
 
                         if (inFront instanceof ConveyorBuild) {
                             convEnd = 2f
-                                    - Math.max(itemSpace - ((ConveyorBuild) inFront).belts[side == 0 ? 1 : 0].minitem,
+                                    - Math.max(actualSpace - ((ConveyorBuild) inFront).belts[side == 0 ? 1 : 0].minitem,
                                             0);
                         }
                     }
 
-                var lastItem = true;
-                minitem = 2f;
+                var actualEnd = convEnd - (rotin ? 1.5f : 0) - (rotout ? 0.5f : 0);
 
-                float maxMove = speed * edelta();
+                var lastItem = true;
+                minitem = actualEnd;
+
+                float maxMove = speed * edelta() * (rotout ? 1.5f : 1f);
 
                 for (int i = len - 1; i >= 0; i--) {
                     var curItem = beltItems[i];
@@ -188,7 +191,7 @@ public class Conveyor extends Block implements Autotiler {
                         lastItem = false;
                     } else {
                         var nextItem = beltItems[i + 1].y;
-                        maxPos = nextItem - itemSpace;
+                        maxPos = nextItem - actualSpace;
                     }
 
                     float moveAmount = Mathf.clamp(maxPos - curItem.y, 0, maxMove);
@@ -197,15 +200,15 @@ public class Conveyor extends Block implements Autotiler {
 
                     var oldY = curItem.y;
 
-                    if (curItem.y > convEnd) {
-                        curItem.y = convEnd;
+                    if (curItem.y > actualEnd) {
+                        curItem.y = actualEnd;
                     }
 
-                    curItem.x = Mathf.approach(curItem.x, 0, moveAmount * 2);
+                    curItem.x = Mathf.approach(curItem.x, 0, moveAmount * 3 * (Math.abs(curItem.x) + 0.1f));
 
                     var skipMin = false;
 
-                    if (oldY >= convEnd) {
+                    if (oldY >= actualEnd) {
                         if (pass(curItem.item, side)) {
                             skipMin = true;
                             len++;
@@ -217,7 +220,7 @@ public class Conveyor extends Block implements Autotiler {
                                     var targetSide = 1 - side * 2;
                                 }
                             }
-                            items.remove(curItem.item, len - i);
+                            items.remove(curItem.item, 1);
                             len = Math.min(i, len);
                         }
                     }
@@ -227,7 +230,7 @@ public class Conveyor extends Block implements Autotiler {
                     }
                 }
 
-                if (minitem < itemSpace + (blendbits == 1 ? 0.3f : 0f)) {
+                if (minitem < actualSpace) {
                     clogHeat = Mathf.approachDelta(clogHeat, 1f, 1f / 60f);
                 } else {
                     clogHeat = 0f;
@@ -268,20 +271,24 @@ public class Conveyor extends Block implements Autotiler {
                 float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(),
                         scaling = 0.01f;
 
+                boolean rotating = blendbits == 1;
+                boolean rotin = rotating && side == innerBelt;
+                boolean rotout = rotating && side != innerBelt;
+
                 for (int i = 0; i < len; i++) {
                     var curitem = beltItems[i];
 
                     Item item = curitem.item;
 
-                    // 0 -> -0.5
-                    // 1 -> 0.5
                     var sideOffset = (side - 0.5f) * 1.5f;
 
                     Tmp.v1.trns(rotation * 90, tilesize);
                     Tmp.v2.trns(rotation * 90, -tilesize / 2f, (curitem.x - sideOffset) * tilesize / 2f);
 
-                    float ix = (x + Tmp.v1.x * (curitem.y - 0.5f) + Tmp.v2.x),
-                            iy = (y + Tmp.v1.y * (curitem.y - 0.5f) + Tmp.v2.y);
+                    float realY = curitem.y + (rotin ? 1.5f : 0) + (rotout ? 0.75f : 0) - 0.5f;
+
+                    float ix = (x + Tmp.v1.x * realY + Tmp.v2.x),
+                            iy = (y + Tmp.v1.y * realY + Tmp.v2.y);
 
                     Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
                     Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
@@ -293,7 +300,17 @@ public class Conveyor extends Block implements Autotiler {
             }
 
             public boolean hasSpace() {
-                return (len < perBeltCap) && minitem >= itemSpace;
+                if (blendbits == 0) {
+                    return (len < perBeltCap) && minitem >= itemSpace;
+                } else if (blendbits == 1) {
+                    if (side == innerBelt) {
+                        return minitem >= itemSpace;
+                    } else {
+                        return minitem >= itemSpace * 1.5f;
+                    }
+                } else {
+                    return false;
+                }
             }
 
             public ConveyorBelt(int side) {
@@ -305,6 +322,7 @@ public class Conveyor extends Block implements Autotiler {
         public int blendsclx = 1, blendscly = 1;
 
         public int dumpNo = 0;
+        public short innerBelt = 0;
 
         public ConveyorBuild nextc;
         Tile front1;
@@ -317,23 +335,6 @@ public class Conveyor extends Block implements Autotiler {
 
             int frame = running ? (int) (((Time.time * speed * 8f * timeScale * efficiency)) % 4)
                     : 0;
-
-            /*
-             * TODO
-             * // draw extra conveyors facing this one for non-square tiling purposes
-             * Draw.z(Layer.blockUnder);
-             * for (int i = 0; i < 4; i++) {
-             * if ((blending & (1 << i)) != 0) {
-             * int dir = rotation - i;
-             * float rot = i == 0 ? rotation * 90 : (dir) * 90;
-             * 
-             * Draw.rect(sliced(regions[0][frame], i != 0 ? SliceMode.bottom :
-             * SliceMode.top),
-             * x + Geometry.d4x(dir) * tilesize * 0.75f * size,
-             * y + Geometry.d4y(dir) * tilesize * 0.75f * size, rot);
-             * }
-             * }
-             */
 
             Draw.z(Layer.block - 0.2f);
 
@@ -360,10 +361,6 @@ public class Conveyor extends Block implements Autotiler {
 
         @Override
         public void overwrote(Seq<Building> builds) {
-            if (builds.first() instanceof ConveyorBuild build) {
-                belts = build.belts.clone(); // Note to self: If something is wrong, replace with a deep copy trust
-                items.add(build.items);
-            }
         }
 
         @Override
@@ -372,12 +369,41 @@ public class Conveyor extends Block implements Autotiler {
         }
 
         public int[] buildBlending() {
-            int[] blendresult = new int[3];
+            int[] blendresult = new int[5];
 
             blendresult[0] = 0;
             blendresult[1] = blendresult[2] = 1;
+            blendresult[3] = 0;
 
+            var fromSides = new int[] { -1, -1, -1 };
+
+            var i = 0;
             for (Building near : proximity) {
+                Tmp.v1.set(this.getRelOffset(near)).rotate(rotation * -90);
+                var angle = Mathf.round((Tmp.v1.angle() / 90f));
+                angle = Mathf.mod(angle, 4);
+
+                if (angle != 0) {
+                    if (near instanceof ConveyorBuild) {
+                        var nearc = (ConveyorBuild) near;
+                        if (nearc.front1.build == this || nearc.front2.build == this) {
+                            fromSides[i++] = angle;
+                        }
+                    }
+                }
+            }
+
+            if (i == 0) {
+                return blendresult;
+            }
+
+            if (i == 1) {
+                if (fromSides[0] != 2) {
+                    var side = fromSides[0];
+                    blendresult[0] = 1;
+
+                    blendresult[2] = (side == 1 ? 1 : -1);
+                }
             }
 
             return blendresult;
@@ -391,6 +417,10 @@ public class Conveyor extends Block implements Autotiler {
             blendbits = bits[0];
             blendsclx = bits[1];
             blendscly = bits[2];
+            innerBelt = (short) Mathf.round((-blendscly / 2f) + 0.5f);
+
+            // -1 -> 0
+            // 1 -> 1
 
             var thisX = x / tilesize;
             var thisY = y / tilesize;
@@ -467,23 +497,21 @@ public class Conveyor extends Block implements Autotiler {
 
             if (item != null && next != null && next.team == team && next.acceptItem(this, item)) {
                 if (nextc != null) {
-                    if (nextc.rotation == rotation) {
-                        if (nextc.belts[side].hasSpace()) {
-                            nextc.handleItem(side, item);
-                            return true;
-                        } else {
-                            return false;
+                    if (nextc.belts[side].hasSpace()) {
+                        nextc.handleItem(side, item);
+                        if (nextc.blendbits == 1) {
+                            nextc.belts[side].beltItems[0].x = side == nextc.innerBelt ? -1.25f : -2.5f;
                         }
+                        return true;
                     } else {
                         return false;
                     }
                 } else {
-                    if (next instanceof ConveyorBuild) {
+                    if (next instanceof ConveyorBuild bnext) {
                         if (next.rotation == rotation) {
                             // If next belt isnt not aligned
-                            var targetSide = side == 0 ? 1 : 0;
+                            var targetSide = 1 - side;
                             var offset = side == 0 ? -0.5f : 0.5f;
-                            var bnext = (ConveyorBuild) next;
 
                             if (bnext.belts[targetSide].hasSpace()) {
                                 bnext.handleItem(targetSide, item);
@@ -491,7 +519,21 @@ public class Conveyor extends Block implements Autotiler {
                                 return true;
                             }
                         } else {
-                            return false;
+                            if (bnext.blendbits == 1) {
+                                var targetSide = 1 - side;
+                                if (bnext.belts[targetSide].hasSpace()) {
+                                    bnext.handleItem(targetSide, item);
+                                    if (bnext.blendbits == 1) {
+                                        bnext.belts[targetSide].beltItems[0].x = targetSide == bnext.innerBelt ? -1.25f
+                                                : -2.5f;
+                                    }
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
                         }
                     } else {
                         // If building is not a conveyor
@@ -563,8 +605,10 @@ public class Conveyor extends Block implements Autotiler {
             var angle = Mathf.angle(relCoords.x, relCoords.y);
             var direction = (Math.floor((angle - 135f) / 90f) + 40) % 4;
 
-            if (!(source instanceof ConveyorBuild) || true) { // TODO
-                if (direction != 0) {
+            if (!(source instanceof ConveyorBuild)) { // TODO
+                return direction == 0;
+            } else {
+                if (direction == 2) {
                     return false;
                 }
             }
@@ -673,7 +717,6 @@ public class Conveyor extends Block implements Autotiler {
                 for (int j = 0; j < belts[i].len; j++) {
                     int val = read.i();
 
-                    Log.info(val);
                     short id = (short) (((byte) (val >> 24)) & 0xff);
                     float x = (float) ((byte) (val >> 16)) / 127f;
                     float y = ((float) ((byte) (val >> 8)) + 128f) / 127f;
