@@ -3,7 +3,9 @@ package mindustry.world.blocks.distribution;
 import java.lang.Math;
 import java.util.Arrays;
 
+import arc.Core;
 import arc.func.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -30,7 +32,7 @@ public class Conveyor extends Block {
     private static final float itemSpace = 0.4f;
     private static int perBeltCap = 6;
 
-    public @Load(value = "@-#1-#2", lengths = { 7, 4 }) TextureRegion[][] regions;
+    public @Load(value = "@-#1-#2", lengths = { 7, 8 }) TextureRegion[][] regions;
 
     public float speed = 0f;
     public float displayedSpeed = 0f;
@@ -150,28 +152,40 @@ public class Conveyor extends Block {
             public int side;
 
             public void update(Building inFront) {
-                // float convEnd = 2f
-                // aligned ? (1f * size) - Math.max(itemSpace - nextc.minitem2, 0) : (1f * size)
-                // ;
-
                 boolean rotating = blendbits == 1;
                 boolean rotin = rotating && side == innerBelt;
                 boolean rotout = rotating && side != innerBelt;
 
+                boolean sidein = false;
+                if (inFront instanceof ConveyorBuild cb) {
+                    sidein = cb.blendbits == 2;
+                }
+
                 float convEnd = 2f;
                 var actualSpace = itemSpace * (rotout ? 1.5f : 1);
+
                 if (inFront != null && inFront.rotation == rotation)
                     label1: {
-
                         if (nextc != null) {
-                            convEnd = 2f - Math.max(actualSpace - nextc.belts[side].minitem, 0);
+                            if (sidein && nextc.rotation != rotation) {
+                                convEnd = 2f - actualSpace;
+                            } else {
+                                convEnd = 2f - Math.max(actualSpace - nextc.belts[side].minitem, 0);
+                            }
                             break label1;
                         }
 
-                        if (inFront instanceof ConveyorBuild) {
-                            convEnd = 2f
-                                    - Math.max(actualSpace - ((ConveyorBuild) inFront).belts[side == 0 ? 1 : 0].minitem,
-                                            0);
+                        if (inFront instanceof ConveyorBuild nc) {
+                            if (sidein && nextc.rotation != rotation) {
+                                convEnd = 2f - actualSpace;
+                            } else {
+                                convEnd = 2f
+                                        - Math.max(
+                                                actualSpace
+                                                        - (nc.belts[side == 0 ? 1 : 0].minitem),
+                                                0);
+
+                            }
                         }
                     }
 
@@ -180,7 +194,7 @@ public class Conveyor extends Block {
                 var lastItem = true;
                 minitem = actualEnd;
 
-                float maxMove = speed * edelta() * (rotout ? 1.5f : 1f);
+                float maxMove = speed * edelta() * (rotout ? 1.42f : 1f);
 
                 for (int i = len - 1; i >= 0; i--) {
                     var curItem = beltItems[i];
@@ -204,7 +218,8 @@ public class Conveyor extends Block {
                         curItem.y = actualEnd;
                     }
 
-                    curItem.x = Mathf.approach(curItem.x, 0, moveAmount * 3 * (Math.abs(curItem.x) + 0.1f));
+                    curItem.x = Mathf.approach(curItem.x, 0,
+                            moveAmount * 2f);
 
                     var skipMin = false;
 
@@ -248,6 +263,52 @@ public class Conveyor extends Block {
                 len++;
             }
 
+            public int insertAt(Item item, float location) {
+                int insertLoc = -1;
+
+                if (len > 1) {
+                    for (int i = 0; i < len - 1; i++) {
+                        var thisItem = beltItems[i];
+                        var nextItem = beltItems[i + 1];
+
+                        var afterThis = location > (thisItem.y + itemSpace);
+                        var beforNext = location < (nextItem.y - itemSpace);
+
+                        if (afterThis && beforNext) {
+                            insertLoc = i + 1;
+                        }
+                    }
+
+                    if (insertLoc == -1) {
+                        if (location < beltItems[0].y - itemSpace) {
+                            insertLoc = 0;
+                        }
+                        if (location > beltItems[len - 1].y + itemSpace) {
+                            insertLoc = len;
+                        }
+                    }
+                } else if (len == 1) {
+                    insertLoc = location < beltItems[0].y ? 0 : 1;
+                } else {
+                    insertLoc = 0;
+                }
+
+                if (insertLoc == -1) {
+                    Log.err("beans");
+                }
+
+                for (int i = len; i > insertLoc; i--) {
+                    beltItems[i] = beltItems[i - 1];
+                }
+
+                beltItems[insertLoc] = new ConveyorItem(item, 0, location);
+                items.add(item, 1);
+                noSleep();
+                len++;
+
+                return insertLoc;
+            }
+
             public void subLastItem() {
                 beltItems[len - 1] = null;
                 len--;
@@ -282,10 +343,31 @@ public class Conveyor extends Block {
 
                     var sideOffset = (side - 0.5f) * 1.5f;
 
-                    Tmp.v1.trns(rotation * 90, tilesize);
-                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, (curitem.x - sideOffset) * tilesize / 2f);
+                    float afterY = curitem.y;
 
-                    float realY = curitem.y + (rotin ? 1.5f : 0) + (rotout ? 0.75f : 0) - 0.5f;
+                    float drawX = curitem.x;
+                    if (rotating) {
+                        // I have no idea how or why this works but it works
+                        var r = ((rotin) ? 0.5f : 1.33f);
+                        var startPos = (rotout ? 0.625f : 1.375f);
+                        var toMove = 2f - startPos;
+                        var passed = (float) (curitem.y / r);
+
+                        if (blendscly == -1) {
+                            afterY = (1 - Mathf.cos(Mathf.pi / 2 * passed)) * toMove + startPos;
+                            drawX = Mathf.approach(-2f, -sideOffset,
+                                    (-sideOffset + 2f) * (Mathf.sin(Mathf.pi / 2 * passed)));
+                        } else {
+                            afterY = (1 - Mathf.cos(Mathf.pi / 2 * passed)) * toMove + startPos;
+                            drawX = -Mathf.approach(-2f, sideOffset,
+                                    (sideOffset + 2f) * (Mathf.sin(Mathf.pi / 2 * passed)));
+                        }
+                        sideOffset = 0;
+                    }
+                    float realY = afterY - 0.5f;
+
+                    Tmp.v1.trns(rotation * 90, tilesize);
+                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, (drawX - sideOffset) * tilesize / 2f);
 
                     float ix = (x + Tmp.v1.x * realY + Tmp.v2.x),
                             iy = (y + Tmp.v1.y * realY + Tmp.v2.y);
@@ -300,7 +382,7 @@ public class Conveyor extends Block {
             }
 
             public boolean hasSpace() {
-                if (blendbits == 0) {
+                if (blendbits == 0 || blendbits == 2) {
                     return (len < perBeltCap) && minitem >= itemSpace;
                 } else if (blendbits == 1) {
                     if (side == innerBelt) {
@@ -311,6 +393,19 @@ public class Conveyor extends Block {
                 } else {
                     return false;
                 }
+            }
+
+            public boolean hasSpace(float wherey) {
+                var ret = true;
+
+                for (int i = 0; i < len; i++) {
+                    var item = beltItems[i];
+
+                    if (item.y - itemSpace < wherey && wherey < item.y + itemSpace) {
+                        ret = false;
+                    }
+                }
+                return ret;
             }
 
             public ConveyorBelt(int side) {
@@ -333,7 +428,7 @@ public class Conveyor extends Block {
         public void draw() {
             var running = enabled && !clogged();
 
-            int frame = running ? (int) (((Time.time * speed * 8f * timeScale * efficiency)) % 4)
+            int frame = running ? (int) (((Time.time * speed * 16f * timeScale * efficiency)) % 8)
                     : 0;
 
             Draw.z(Layer.block - 0.2f);
@@ -401,8 +496,18 @@ public class Conveyor extends Block {
                 if (fromSides[0] != 2) {
                     var side = fromSides[0];
                     blendresult[0] = 1;
-
                     blendresult[2] = (side == 1 ? 1 : -1);
+                }
+            }
+
+            if (i == 2) {
+                var s1 = fromSides[0];
+                var s2 = fromSides[1];
+
+                if (s1 == 2 || s2 == 2) {
+                    var side = s1 == 2 ? s2 : s1;
+                    blendresult[0] = 2;
+                    blendresult[2] = (side == 1 ? -1 : 1);
                 }
             }
 
@@ -497,12 +602,29 @@ public class Conveyor extends Block {
 
             if (item != null && next != null && next.team == team && next.acceptItem(this, item)) {
                 if (nextc != null) {
-                    if (nextc.belts[side].hasSpace()) {
-                        nextc.handleItem(side, item);
-                        if (nextc.blendbits == 1) {
-                            nextc.belts[side].beltItems[0].x = side == nextc.innerBelt ? -1.25f : -2.5f;
+                    if (nextc.blendbits <= 1 || (nextc.blendbits == 2 && nextc.rotation == rotation)) {
+                        if (nextc.belts[side].hasSpace()) {
+                            nextc.handleItem(side, item);
+                            /*
+                             * if (nextc.blendbits == 1) {
+                             * nextc.belts[side].beltItems[0].x = (side == nextc.innerBelt ? -1.25f : -2.5f)
+                             * (-nextc.blendscly);
+                             * }
+                             */
+                        } else {
+                            return false;
                         }
                         return true;
+                    } else if (nextc.blendbits == 2) {
+                        var targetSide = nextc.getRelOffset(this).rotate(nextc.rotation * -90).y > 0 ? 0 : 1;
+                        var theX = ((targetSide == 0 ? 1 - side : side) + 0.5f);
+                        theX = Mathf.approach(theX, 1f, 0.125f);
+                        if (nextc.belts[targetSide].hasSpace(theX)) {
+                            nextc.belts[targetSide].beltItems[nextc.belts[targetSide].insertAt(item,
+                                    theX)].x = (1f * (targetSide == 0 ? 1f : -1f));
+                        } else {
+                            return false;
+                        }
                     } else {
                         return false;
                     }
@@ -524,8 +646,8 @@ public class Conveyor extends Block {
                                 if (bnext.belts[targetSide].hasSpace()) {
                                     bnext.handleItem(targetSide, item);
                                     if (bnext.blendbits == 1) {
-                                        bnext.belts[targetSide].beltItems[0].x = targetSide == bnext.innerBelt ? -1.25f
-                                                : -2.5f;
+                                        bnext.belts[targetSide].beltItems[0].x = (targetSide == bnext.innerBelt ? -1.25f
+                                                : -2.5f) * -bnext.blendscly;
                                     }
                                     return true;
                                 } else {
@@ -605,15 +727,28 @@ public class Conveyor extends Block {
             var angle = Mathf.angle(relCoords.x, relCoords.y);
             var direction = (Math.floor((angle - 135f) / 90f) + 40) % 4;
 
-            if (!(source instanceof ConveyorBuild)) { // TODO
+            if (!(source instanceof ConveyorBuild)) {
                 return direction == 0;
             } else {
                 if (direction == 2) {
                     return false;
+                } else {
+                    if (direction == 0 || blendbits <= 1) {
+                        return checkCapacity(source);
+                    } else {
+                        if (blendbits == 2) {
+                            return checkCapacitySide(source);
+                        }
+                    }
                 }
             }
 
-            return checkCapacity(source);
+            Log.info("brainrot v2");
+            return false;
+        }
+
+        public boolean checkCapacitySide(Building source) {
+            return belts[this.getRelOffset(source).rotate(rotation * -90).y < 0 ? 1 : 0].len < perBeltCap;
         }
 
         public boolean checkCapacity(Building source) {
