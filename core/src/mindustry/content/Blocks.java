@@ -116,10 +116,11 @@ public class Blocks {
             conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge,
             phaseConveyor, sorter, invertedSorter, router,
             overflowGate, underflowGate, massDriver,
+            inserter,
 
             // transport - alternate
-            duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader,
-            surgeConveyor, surgeRouter,
+            duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader, surgeConveyor,
+            surgeRouter,
 
             unitCargoLoader, unitCargoUnloadPoint,
 
@@ -133,13 +134,12 @@ public class Blocks {
 
             // power
             combustionGenerator, thermalGenerator, steamGenerator, differentialGenerator, rtgGenerator, solarPanel,
-            largeSolarPanel, thoriumReactor,
-            impactReactor, battery, batteryLarge, powerNode, powerNodeLarge, surgeTower, diode,
+            largeSolarPanel, thoriumReactor, impactReactor, battery, batteryLarge, powerNode, powerNodeLarge,
+            surgeTower, diode,
 
             // power - erekir
             turbineCondenser, ventCondenser, chemicalCombustionChamber, pyrolysisGenerator, fluxReactor,
-            neoplasiaReactor,
-            beamNode, beamTower, beamLink,
+            neoplasiaReactor, beamNode, beamTower, beamLink,
 
             // production
             mechanicalDrill, pneumaticDrill, laserDrill, blastDrill, waterExtractor, oilExtractor, cultivator,
@@ -158,18 +158,15 @@ public class Blocks {
             breach, diffuse, sublimate, titan, disperse, afflict, lustre, scathe, smite, malign,
 
             // units
-            groundFactory, airFactory, navalFactory,
-            additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor,
-            repairPoint, repairTurret,
+            groundFactory, airFactory, navalFactory, additiveReconstructor, multiplicativeReconstructor,
+            exponentialReconstructor, tetrativeReconstructor, repairPoint, repairTurret,
 
             // units - erekir
             tankFabricator, shipFabricator, mechFabricator,
 
-            tankRefabricator, shipRefabricator, mechRefabricator,
-            primeRefabricator,
+            tankRefabricator, shipRefabricator, mechRefabricator, primeRefabricator,
 
-            tankAssembler, shipAssembler, mechAssembler,
-            basicAssemblerModule,
+            tankAssembler, shipAssembler, mechAssembler, basicAssemblerModule,
 
             unitRepairTower,
 
@@ -180,9 +177,7 @@ public class Blocks {
 
             // logic
             message, switchBlock, microProcessor, logicProcessor, hyperProcessor, largeLogicDisplay, logicDisplay,
-            memoryCell, memoryBank,
-            canvas, reinforcedMessage,
-            worldProcessor, worldCell, worldMessage, worldSwitch,
+            memoryCell, memoryBank, canvas, reinforcedMessage, worldProcessor, worldCell, worldMessage, worldSwitch,
 
             // campaign
             launchPad, interplanetaryAccelerator
@@ -2351,6 +2346,15 @@ public class Blocks {
                 researchCost = with(Items.copper, 25);
 
                 size = 2;
+            }
+        };
+
+        inserter = new Inserter("inserter") {
+            {
+                requirements(Category.distribution, with(Items.copper, 20, Items.lead, 10));
+                health = 300;
+                speed = 360f / 60f; // Degrees / tick
+                researchCost = with(Items.copper, 10, Items.lead, 30);
             }
         };
 

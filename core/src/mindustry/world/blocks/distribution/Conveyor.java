@@ -158,7 +158,7 @@ public class Conveyor extends Block {
 
                 boolean sidein = false;
                 if (inFront instanceof ConveyorBuild cb) {
-                    sidein = cb.blendbits == 2;
+                    sidein = cb.blendbits == 2 || cb.blendbits == 3;
                 }
 
                 float convEnd = 2f;
@@ -382,7 +382,7 @@ public class Conveyor extends Block {
             }
 
             public boolean hasSpace() {
-                if (blendbits == 0 || blendbits == 2) {
+                if (blendbits == 0 || blendbits == 2 || blendbits == 3) {
                     return (len < perBeltCap) && minitem >= itemSpace;
                 } else if (blendbits == 1) {
                     if (side == innerBelt) {
@@ -481,9 +481,16 @@ public class Conveyor extends Block {
                 if (angle != 0) {
                     if (near instanceof ConveyorBuild) {
                         var nearc = (ConveyorBuild) near;
-                        if (nearc.front1.build == this || nearc.front2.build == this) {
-                            fromSides[i++] = angle;
-                        }
+                        if (nearc.front1.build == this || nearc.front2.build == this)
+                            label2: {
+
+                                for (int side : fromSides) {
+                                    if (side == angle) {
+                                        break label2;
+                                    }
+                                }
+                                fromSides[i++] = angle;
+                            }
                     }
                 }
             }
@@ -508,7 +515,13 @@ public class Conveyor extends Block {
                     var side = s1 == 2 ? s2 : s1;
                     blendresult[0] = 2;
                     blendresult[2] = (side == 1 ? -1 : 1);
+                } else {
+                    blendresult[0] = 4;
                 }
+            }
+
+            if (i == 3) {
+                blendresult[0] = 3;
             }
 
             return blendresult;
@@ -602,20 +615,15 @@ public class Conveyor extends Block {
 
             if (item != null && next != null && next.team == team && next.acceptItem(this, item)) {
                 if (nextc != null) {
-                    if (nextc.blendbits <= 1 || (nextc.blendbits == 2 && nextc.rotation == rotation)) {
+                    if (nextc.blendbits <= 1
+                            || ((nextc.blendbits == 2 || nextc.blendbits == 3) && nextc.rotation == rotation)) {
                         if (nextc.belts[side].hasSpace()) {
                             nextc.handleItem(side, item);
-                            /*
-                             * if (nextc.blendbits == 1) {
-                             * nextc.belts[side].beltItems[0].x = (side == nextc.innerBelt ? -1.25f : -2.5f)
-                             * (-nextc.blendscly);
-                             * }
-                             */
                         } else {
                             return false;
                         }
                         return true;
-                    } else if (nextc.blendbits == 2) {
+                    } else if (nextc.blendbits >= 2) {
                         var targetSide = nextc.getRelOffset(this).rotate(nextc.rotation * -90).y > 0 ? 0 : 1;
                         var theX = ((targetSide == 0 ? 1 - side : side) + 0.5f);
                         theX = Mathf.approach(theX, 1f, 0.125f);
@@ -650,6 +658,16 @@ public class Conveyor extends Block {
                                                 : -2.5f) * -bnext.blendscly;
                                     }
                                     return true;
+                                } else {
+                                    return false;
+                                }
+                            } else if (bnext.blendbits >= 2) {
+                                var targetSide = bnext.getRelOffset(this).rotate(bnext.rotation * -90).y > 0 ? 0 : 1;
+                                var theX = 2f - ((targetSide == 0 ? 1 - side : side) + 0.5f);
+                                theX = Mathf.approach(theX, 1f, 0.125f);
+                                if (bnext.belts[targetSide].hasSpace(theX)) {
+                                    bnext.belts[targetSide].beltItems[bnext.belts[targetSide].insertAt(item,
+                                            theX)].x = (1f * (targetSide == 0 ? 1f : -1f));
                                 } else {
                                     return false;
                                 }
@@ -736,7 +754,7 @@ public class Conveyor extends Block {
                     if (direction == 0 || blendbits <= 1) {
                         return checkCapacity(source);
                     } else {
-                        if (blendbits == 2) {
+                        if (blendbits >= 2) {
                             return checkCapacitySide(source);
                         }
                     }
