@@ -15,15 +15,14 @@ public class SerpuloTechTree {
         Planets.serpulo.techTree = nodeRoot("serpulo", coreShard, () -> {
 
             node(conveyor, () -> {
+                node(inserter, () -> {
+
+                });
 
                 node(junction, () -> {
                     node(router, () -> {
                         node(launchPad, Seq.with(new SectorComplete(extractionOutpost)), () -> {
-                            // no longer necessary to beat the campaign
-                            // node(interplanetaryAccelerator, Seq.with(new
-                            // SectorComplete(planetaryTerminal)), () -> {
 
-                            // });
                         });
 
                         node(distributor);
@@ -34,7 +33,6 @@ public class SerpuloTechTree {
                             });
                         });
                         node(container, Seq.with(new SectorComplete(biomassFacility)), () -> {
-                            node(unloader);
                             node(vault, Seq.with(new SectorComplete(stainedMountains)), () -> {
 
                             });

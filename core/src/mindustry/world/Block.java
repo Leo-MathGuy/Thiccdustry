@@ -491,6 +491,9 @@ public class Block extends UnlockableContent implements Senseable {
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec */
     public int dumpTime = 5;
 
+    /** Allow conveyor input/output */
+    public boolean allowConv = false;
+
     public Block(String name) {
         super(name);
         initBuilding();

@@ -677,7 +677,11 @@ public class Conveyor extends Block {
                         }
                     } else {
                         // If building is not a conveyor
-                        next.handleItem(this, item);
+                        if (next.block.allowConv) {
+                            next.handleItem(this, item);
+                        } else {
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -746,7 +750,7 @@ public class Conveyor extends Block {
             var direction = (Math.floor((angle - 135f) / 90f) + 40) % 4;
 
             if (!(source instanceof ConveyorBuild)) {
-                return direction == 0;
+                return direction == 0 && source.block.allowConv;
             } else {
                 if (direction == 2) {
                     return false;

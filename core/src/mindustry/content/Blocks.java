@@ -113,10 +113,10 @@ public class Blocks {
             shieldBreaker,
 
             // transport
-            conveyor, titaniumConveyor, plastaniumConveyor, armoredConveyor, distributor, junction, itemBridge,
+            conveyor, distributor, junction, itemBridge,
             phaseConveyor, sorter, invertedSorter, router,
             overflowGate, underflowGate, massDriver,
-            inserter,
+            inserter, poweredInserter,
 
             // transport - alternate
             duct, armoredDuct, ductRouter, overflowDuct, underflowDuct, ductBridge, ductUnloader, surgeConveyor,
@@ -146,7 +146,7 @@ public class Blocks {
             cliffCrusher, plasmaBore, largePlasmaBore, impactDrill, eruptionDrill,
 
             // storage
-            coreShard, coreFoundation, coreNucleus, vault, container, unloader,
+            coreShard, coreFoundation, coreNucleus, vault, container,
             // storage - erekir
             coreBastion, coreCitadel, coreAcropolis, reinforcedContainer, reinforcedVault,
 
@@ -2353,8 +2353,27 @@ public class Blocks {
             {
                 requirements(Category.distribution, with(Items.copper, 20, Items.lead, 10));
                 health = 300;
-                speed = 360f / 60f; // Degrees / tick
+                speed = 1f / (1f / 6f); // Degrees / tick
                 researchCost = with(Items.copper, 10, Items.lead, 30);
+                configurable = false;
+            }
+        };
+
+        poweredInserter = new Inserter("inserter-p") {
+            {
+                requirements(Category.distribution,
+                        with(Items.copper, 50, Items.lead, 60, Items.silicon, 10, Items.graphite, 10));
+                health = 400;
+                speed = 2f / (1f / 6f);
+                researchCost = with(Items.copper, 200, Items.lead, 150, Items.silicon, 300, Items.graphite, 500);
+
+                hasPower = true;
+                basePower = 0.15f;
+                // consume(new ConsumePowerDynamic((InserterBuild.e) -> e.curOverdrive == 0 ?
+                // e.basePower : Math.min(e.basePower * 4, Mathf.pow(e.basePower * 60f,
+                // overdrives[e.curOverdrive]))));
+
+                overdrives = new float[] { 2f };
             }
         };
 
@@ -3661,14 +3680,15 @@ public class Blocks {
             }
         };
 
-        // TODO move tabs?
-        unloader = new Unloader("unloader") {
-            {
-                requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
-                speed = 60f / 11f;
-                group = BlockGroup.transportation;
-            }
-        };
+        /*
+         * unloader = new Unloader("unloader") {
+         * {
+         * requirements(Category.effect, with(Items.titanium, 25, Items.silicon, 30));
+         * speed = 60f / 11f;
+         * group = BlockGroup.transportation;
+         * }
+         * };
+         */
 
         reinforcedContainer = new StorageBlock("reinforced-container") {
             {

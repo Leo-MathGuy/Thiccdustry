@@ -28,6 +28,7 @@ public class ItemSource extends Block {
         noUpdateDisabled = true;
         envEnabled = Env.any;
         clearOnDoubleTap = true;
+        allowConv = true;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);

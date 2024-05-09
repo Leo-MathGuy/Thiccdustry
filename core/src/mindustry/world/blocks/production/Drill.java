@@ -84,6 +84,7 @@ public class Drill extends Block {
         // drills work in space I guess
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
+        allowConv = true;
     }
 
     @Override
